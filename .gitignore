@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+.tmp/
+*.log
+.DS_Store
+Thumbs.db
+
+# Common generated service outputs
+demo-service/
+**/node_modules/
+**/dist/
+**/coverage/

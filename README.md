@@ -1,139 +1,116 @@
 # Internal Developer Platform Lite
 
-Golden-path service scaffolding CLI with built-in observability, CI/CD standards, and operational guardrails.
+[![Platform Engineering](https://img.shields.io/badge/Platform%20Engineering-Reference-0A7EA4)](#what-it-is)
+[![Golden Path](https://img.shields.io/badge/Golden%20Path-CLI%20Scaffolding-2A9D8F)](#quick-start)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6)](#built-in-guardrails)
+[![Fastify Template](https://img.shields.io/badge/Fastify-Template-000000)](#generated-structure)
+[![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Baseline-F97316)](#built-in-guardrails)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF)](#built-in-guardrails)
 
-Internal Developer Platform Lite (IDP-Lite) is a reference implementation demonstrating how platform teams can standardize service creation through opinionated templates, baked-in quality controls, and operational readiness from day one.
+A minimal Internal Developer Platform (IDP) reference implementation focused on a CLI-based golden path service generator.
 
-This project is intentionally minimal. It is not a portal, not Backstage, and not an enterprise control plane. It is a focused demonstration of platform engineering principles in code.
+## What It Is
 
----
+`idp-lite` generates production-ready service skeletons with opinionated defaults:
 
-## 🛡 What This Repository Demonstrates
+- Fastify API scaffold
+- Strict TypeScript configuration
+- OpenTelemetry baseline
+- Structured JSON logging with correlation IDs
+- Health/readiness endpoints
+- GitHub Actions CI (lint -> test -> coverage gate -> build -> docker build)
+- Dockerfile
+- Documentation templates (ADR, SLO, Runbook)
 
-- Golden-path service scaffolding
-- Opinionated platform guardrails
-- Built-in observability (OpenTelemetry + structured logging)
-- CI/CD pipeline standards
-- Strict TypeScript + lint enforcement
-- Health endpoints and operational readiness
-- ADR and SLO templates
-- Platform-first engineering thinking
+This repository is intentionally lite: no portal, no UI control plane, no Backstage.
 
-This repository models how to design engineering systems — not just individual services.
+## Why Lite
 
----
+- Platform value is in fast, consistent service creation and guardrails.
+- Teams get operational readiness on day one without a platform UI rollout.
+- The architecture stays maintainable: CLI parsing, generation logic, and templates are separated.
 
-## 🎯 Purpose
-
-Engineering organizations scale through consistency, not heroics.
-
-IDP-Lite demonstrates how a platform team can:
-
-- Reduce cognitive load for service teams
-- Enforce architectural standards
-- Bake observability in from day one
-- Standardize CI/CD workflows
-- Encourage documentation discipline
-- Improve delivery reliability across teams
-
-It represents a "golden path" approach to service creation.
-
----
-
-## 🏗 Conceptual Architecture
-
-```mermaid
-flowchart LR
-
-CLI[IDP-Lite CLI] --> Generator[Service Generator]
-Generator --> Template[Opinionated Service Template]
-Template --> Service[Generated Service]
-Service --> CI[CI/CD Pipeline]
-Service --> Telemetry[OpenTelemetry + Logging]
-Service --> Docs[ADR + SLO + Runbook]
-```
-
-The CLI generates a production-ready service skeleton with platform guardrails preconfigured.
-
----
-
-## 🚀 Example Usage
+## Quick Start
 
 ```bash
-npx idp-lite create orders-service
+npm install
+npm run build
+node dist/cli.js create demo-service
 ```
 
-Generated output:
+Optional output path:
 
+```bash
+node dist/cli.js create demo-service --out ./services/demo-service
 ```
-orders-service/
+
+## Run With Docker
+
+Build a named image (avoids dangling `<none>:<none>` images):
+
+```bash
+cd demo-service
+docker build -t demo-service:local .
+```
+
+Run with port publishing so the host can reach the service:
+
+```bash
+docker run --rm --name demo-service -p 3000:3000 demo-service:local
+```
+
+Test endpoints from another terminal:
+
+```bash
+curl http://127.0.0.1:3000/health
+curl http://127.0.0.1:3000/ready
+```
+
+If starting from Docker Desktop UI, ensure container port `3000` is published to host port `3000`.
+
+## Generated Structure
+
+```text
+demo-service/
   src/
     index.ts
     health.ts
-    telemetry.ts
     logger.ts
+    telemetry.ts
   test/
-  Dockerfile
-  .github/workflows/ci.yml
-  tsconfig.json
-  .eslintrc.json
-  package.json
+    health.test.ts
   docs/
-    adr/
-      ADR-0001.md
+    adr/ADR-0001.md
     slo.md
     runbook.md
+  .github/workflows/ci.yml
+  .eslintrc.json
+  Dockerfile
+  package.json
+  tsconfig.json
+  vitest.config.ts
 ```
 
----
+## Built-In Guardrails
 
-## 🔍 Built-In Guardrails
+- Observability by default (OpenTelemetry + structured logs + correlation IDs)
+- Quality baseline (strict TypeScript + ESLint + tests)
+- Delivery standards (CI pipeline with coverage threshold)
+- Operational readiness (health endpoints + runbook/SLO/ADR templates)
 
-### Observability
-- OpenTelemetry tracing baseline
-- Structured JSON logging
-- Correlation ID middleware
-- Health endpoints
+## Conceptual Architecture
 
-### Delivery Standards
-- CI workflow (lint → test → build → docker)
-- Coverage threshold enforcement
-- Dockerized service template
+```mermaid
+flowchart LR
+  CLI["CLI (commander)"] --> GEN["Service Generator"]
+  GEN --> TPL["Template Files (/src/templates/service)"]
+  TPL --> SVC["Generated Service"]
+  SVC --> OBS["Observability Defaults"]
+  SVC --> DOCS["ADR / SLO / Runbook"]
+  SVC --> CI["CI + Docker"]
+```
 
-### Quality Controls
-- Strict TypeScript configuration
-- ESLint rules
-- Test scaffold
+## Repository Docs
 
-### Operational Discipline
-- ADR template
-- SLO template
-- Runbook template
-
----
-
-## 📐 Design Principles
-
-1. Opinionated over flexible
-2. Guardrails over guidelines
-3. Observability by default
-4. Documentation as a first-class artifact
-5. Delivery standards embedded in scaffolding
-6. Extensible template architecture
-
----
-
-## 📌 Intended Audience
-
-- Platform Engineers
-- Principal / Staff Engineers
-- Engineering Managers
-- DevEx teams
-- Organizations establishing internal platform standards
-
----
-
-## 📌 Status
-
-Reference implementation focused on demonstrating platform engineering patterns through a minimal but realistic CLI-based golden path generator.
-
+- `docs/architecture.md` for layering and extension model
+- `docs/platform-principles.md` for platform design principles
